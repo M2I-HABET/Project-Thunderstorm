@@ -1,0 +1,2 @@
+Width = 38.1mm (1.5in)
+Length = 69.85mm (2.75)
