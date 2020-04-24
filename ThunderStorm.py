@@ -20,7 +20,7 @@ print("start up")
 # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
 # pylint: disable=c-extension-no-member
 CS = digitalio.DigitalInOut(board.D10)
-HR = dgitalio.DigitalInOut(Boards.A0)
+HR = digitalio.DigitalInOut(board.A0)
 
 # pylint: disable=c-extension-no-member
 RESET = digitalio.DigitalInOut(board.D11)
