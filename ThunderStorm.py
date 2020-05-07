@@ -203,7 +203,7 @@ while True:
             gps_str = str(gps_message)
             print(gps_str)
             sendMessage(gps_str)
-            datastr = "DATA,BME," + A + ",ResistanceTemp," + B + ",eol"
+            datastr = "DATA,BME," + A + "," + B + ",eol"
             print(datastr)
             sendMessage(datastr)
     if current-old>2:
@@ -212,7 +212,7 @@ while True:
         nogps_str = str(nogps_message)
         sendMessage(nogps_str)
         print(nogps_str)
-        datastr = "DATA,BME," + A + B + ",eol"
+        datastr = "DATA,BME," + A + "," + B + ",eol"
         print(datastr)
         sendMessage(datastr)
     packet = rfm9x.receive(timeout=.1)
