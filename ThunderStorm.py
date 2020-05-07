@@ -20,7 +20,7 @@ print("start up")
 # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
 # pylint: disable=c-extension-no-member
 CS = digitalio.DigitalInOut(board.D10)
-HR = dgitalio.DigitalInOut(Boards.A0)
+HR = digitalio.DigitalInOut(board.A0)
 
 # pylint: disable=c-extension-no-member
 RESET = digitalio.DigitalInOut(board.D11)
@@ -117,12 +117,12 @@ pt100 = adafruit_max31865.MAX31865(spi, HR, rtd_nominal=100, ref_resistor=430.0,
 
 
 def sendMessage(message):
-    #try:
+    try:
         LED.value = True
         rfm9x.send(FEATHER_ID+b','+message)
         LED.value = False
-    #except:
-    #    print("Message failed to send")
+    except:
+        print("Message failed to send")
 
 current = time.monotonic()
 old = current
@@ -162,7 +162,7 @@ while True:
     # Delay for a second.
 
     RTemp = str('{0:0.3f}'.format(temp))
-    B = 'Resistance Temp,'+ RTemp
+    B = 'ResistTemp,'+ RTemp
 
     #print("\nTemperature: %0.1f C" % bme680.temperature)
     #print("Gas: %d ohm" % bme680.gas)
@@ -212,7 +212,7 @@ while True:
         nogps_str = str(nogps_message)
         sendMessage(nogps_str)
         print(nogps_str)
-        datastr = "DATA,BME," + A + ",ResistanceTemp," + B + ",eol"
+        datastr = "DATA,BME," + A + B + ",eol"
         print(datastr)
         sendMessage(datastr)
     packet = rfm9x.receive(timeout=.1)
