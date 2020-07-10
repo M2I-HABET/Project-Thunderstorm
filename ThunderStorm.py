@@ -246,7 +246,7 @@ while True:
             rssi = rfm9x.rssi
             #print(packet)
             if(b'command' in packet):
-                sendMessage(tr(packet))
+                sendMessage(str(packet))
                 print(str(packet))
         except:
             print("invalid ascii")
