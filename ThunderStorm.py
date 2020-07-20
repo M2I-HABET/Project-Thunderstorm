@@ -6,6 +6,7 @@ import time
 import board
 import busio
 import digitalio
+import analogio
 
 import adafruit_lsm9ds1
 from busio import I2C
@@ -17,6 +18,9 @@ import adafruit_max31865
 FEATHER_ID = b'4'
 
 print("start up")
+
+vbat_voltage = analogio.AnalogIn(board.VOLTAGE_MONITOR)
+
 # Define pins connected to the chip, use these if wiring up the breakout according to the guide:
 # pylint: disable=c-extension-no-member
 CS = digitalio.DigitalInOut(board.D10)
@@ -129,17 +133,23 @@ def sendMessage(message):
 def getDat():
     temp = pt100.temperature
     RTemp = str('{0:0.3f}'.format(temp))
-    B = 'ResistTemp,'+ RTemp
+    B = 'ResTemp,'+ RTemp
     t = str(bme680.temperature)
     g = str(bme680.gas)
     h = str(bme680.humidity)
     p = str(bme680.pressure)
     a = str(bme680.altitude)
+    battery_voltage = get_voltage(vbat_voltage)
+    #print("VBat voltage: {:.2f}".format(battery_voltage))
+    v = "{:.2f}".format(battery_voltage)
 
     A = t + ',' + g + ',' + h + ',' + p + ',' + a
 
-    datstr = "DATA,BME," + A + "," + B + ",HABET" + ",eol"
+    datstr = "DATA,BME," + A + "," + B + ",vbat," + v + ",eol"
     return(datstr)
+
+def get_voltage(pin):
+    return (pin.value * 3.3) / 65536 * 2
 
 current = time.monotonic()
 old = current
@@ -151,32 +161,6 @@ while True:
     # though if you don't care and instead look at the has_fix property).
     #gps.update()
     # Every second print out current location details if there's a fix.
-
-
-
-    # Read acceleration, magnetometer, gyroscope, temperature.
-    #accel_x, accel_y, accel_z = sensor.acceleration
-    #mag_x, mag_y, mag_z = sensor.magnetic
-    #gyro_x, gyro_y, gyro_z = sensor.gyro
-    # Print values.
-    #print('Acceleration (m/s^2): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(accel_x, accel_y, accel_z))
-    #print('Magnetometer (gauss): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(mag_x, mag_y, mag_z))
-    #print('Gyroscope (degrees/sec): ({0:0.3f},{1:0.3f},{2:0.3f})'.format(gyro_x, gyro_y, gyro_z))
-    #print('Temperature: {0:0.3f}C'.format(temp))
-    #time.sleep(1.0)
-    #aX = str('{0:0.3f}'.format(accel_x))
-    #aY = str('{0:0.3f}'.format(accel_y))
-    #aZ = str('{0:0.3f}'.format(accel_z))
-    #mX = str('{0:0.3f}'.format(mag_x))
-    #mY = str('{0:0.3f}'.format(mag_y))
-    #mZ = str('{0:0.3f}'.format(mag_z))
-    #gX = str('{0:0.3f}'.format(gyro_x))
-    #gY = str('{0:0.3f}'.format(gyro_y))
-    #gZ = str('{0:0.3f}'.format(gyro_z))
-    #gZ = str('{0:0.3f}'.format(gyro_z))
-    #B = 'acc,' + aX + ',' + aY + ',' + aZ + ',mag,' + mX + ',' + mY + ',' + mZ + ',gyro,' + gX + ',' + gY + ',' + gZ
-    #print(B)
-    # Delay for a second.
 
     #print("\nTemperature: %0.1f C" % bme680.temperature)
     #print("Gas: %d ohm" % bme680.gas)
@@ -196,9 +180,6 @@ while True:
     #A = [t, g, h, p, a]
     #print(A)
 
-
-
-
     current = time.monotonic()
     #if current - last_print >= 1.0:
     if uart.in_waiting > 0:
@@ -217,13 +198,13 @@ while True:
         old = current
         if newGPS:
             print(gps_str)
-            sendMessage(gps_str + ",HABET")
+            sendMessage(gps_str)
             datastr = getDat()
             sendMessage(datastr)
             print(datastr)
             newGPS = False
         else:
-            sendMessage("No GPS,HABET")
+            sendMessage("No GPS")
             print("No GPS")
             datastr = getDat()
             sendMessage(datastr)
